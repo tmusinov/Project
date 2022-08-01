@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(auth);
 
 app.get('/', (req, res) => {
-    res.json({ message: 'OMEGALUL' });
+    res.json({ message: 'nerfaatrox' });
 });
 
 app.use('/', routes);
