@@ -198,7 +198,7 @@ export default function PrimarySearchAppBar() {
                     >
                     </IconButton>
                     <Typography className={classes.title} variant="h6" noWrap>
-                        InstaCars
+                        Car?
                     </Typography>
                     <div className={classes.search}>
                         <div className={classes.searchIcon}>
