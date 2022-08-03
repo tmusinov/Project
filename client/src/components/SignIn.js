@@ -70,9 +70,6 @@ export default function SignInSide() {
         let token = await authService.login({ email, password });
         console.log(token);
 
-        ssessionStorage.setItem('session', JSON.stringify(token.result.token));
-        localStorage.setItem('_id', token.result.user._id);
-        localStorage.setItem('username', token.result.user.username);
     }
 
     return (
