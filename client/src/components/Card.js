@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import Card from '@material-ui/core/Card';
@@ -18,7 +19,7 @@ import BookmarkBorder from '@material-ui/icons/BookmarkBorder';
 import SendIcon from '@material-ui/icons/Send';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { Button, Container, Grid, Link } from '@material-ui/core';
+import { Button, Container, Grid } from '@material-ui/core';
 
 import UserComment from './UserComment';
 import Comment from "./Comment";
@@ -73,11 +74,23 @@ export default function RecipeReviewCard() {
         console.log(res);
     };
 
+    const handleSave = async (_id) => {
+        let userId = localStorage.getItem('_id');
+        let data = {
+            _id: _id,
+            userId: userId
+        };
+        let res = await postService.save(data);
+        console.log(res);
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             const data = await postService.getAll();
-            console.log(data.result);
-            setPosts(data.result);
+            console.log(data);
+            if (data.result) {
+                setPosts(data.result);
+            }
         };
 
         fetchData();
@@ -97,8 +110,8 @@ export default function RecipeReviewCard() {
                             </IconButton>
                         }
                         title={
-                            <Link href="google.com">
-                                <Typography color="inherit">{x.owner}</Typography>
+                            <Link to={`/profile/${x.owner._id}`}>
+                                <Typography color="inherit">{x.owner.username}</Typography>
                             </Link>
                         }
                     />
@@ -106,7 +119,7 @@ export default function RecipeReviewCard() {
                     <CardMedia className={classes.media} image={x.imageUrl} onDoubleClick={() => handleLike(x._id)} />
 
                     <CardContent>
-                        <Typography component="span">{x._id}</Typography>
+                        <Typography component="span">{x.owner.username} </Typography>
                         <Typography variant="body2" color="textSecondary" component="span">{x.description}</Typography>
                         <Typography>Show more</Typography>
                     </CardContent>
@@ -119,7 +132,7 @@ export default function RecipeReviewCard() {
                         <IconButton aria-label="send">
                             <SendIcon />
                         </IconButton>
-                        <IconButton aria-label="save">
+                        <IconButton aria-label="save" onClick={() => handleSave(x._id)}>
                             <BookmarkBorder />
                         </IconButton>
                         <IconButton
@@ -132,13 +145,17 @@ export default function RecipeReviewCard() {
                         >
                         </IconButton>
                     </CardActions>
-                    <UserComment></UserComment>
-                    <UserComment></UserComment>
+                    
 
-                    <Typography style={{ color: "gray", margin: "10px 20px" }}>1 min</Typography>
-                    <Comment></Comment>
+                    {x.comments.map(comment =>
+                        <UserComment key={comment._id} content={comment.content} username={comment.user.username} />
+                    )}
+
+                    <Typography style={{ color: "gray", margin: "10px 20px" }}>{x.createdAt}</Typography>
+                    <Comment postId={x._id} />
                 </Card>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }

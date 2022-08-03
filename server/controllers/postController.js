@@ -34,5 +34,25 @@ router.post('/:_id/like', auth, async (req, res, next) => {
     }
 });
 
+router.post('/:_id/save', auth, async (req, res, next) => {
+    try {
+        let result = await postService.savePost(req.body);
+        console.log(result);
+        res.status(200).json({ result });
+    } catch (error) {
+        return res.status(400).json(error);
+    }
+});
+
+router.post('/comment', auth, async (req, res, next) => {
+    try {
+        let result = await postService.addComment(req.body);
+        console.log(result);
+        res.status(200).json({ result });
+    } catch (error) {
+        return res.status(400).json(error);
+    }
+});
+
 
 module.exports = router;
