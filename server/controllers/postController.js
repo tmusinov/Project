@@ -4,7 +4,7 @@ const postService = require('../services/postService');
 const { auth } = require('../middlewares/auth');
 
 
-router.post('/create', auth, async (req, res, next) => {
+router.post('/create', async (req, res, next) => {
     try {
         let result = await postService.create(req.body);
         console.log(result);
@@ -24,7 +24,17 @@ router.get('/all', auth, async (req, res, next) => {
     }
 });
 
-router.post('/:_id/like', auth, async (req, res, next) => {
+router.get('/:id', auth, async (req, res, next) => {
+    try {
+        let result = await postService.getById(req.params.id);
+        console.log(result);
+        res.status(200).json({ result });
+    } catch (error) {
+        return res.status(400).json(error);
+    }
+});
+
+router.post('/:_id/like', async (req, res, next) => {
     try {
         let result = await postService.likePost(req.body);
         console.log(result);
@@ -34,7 +44,7 @@ router.post('/:_id/like', auth, async (req, res, next) => {
     }
 });
 
-router.post('/:_id/save', auth, async (req, res, next) => {
+router.post('/:_id/save', async (req, res, next) => {
     try {
         let result = await postService.savePost(req.body);
         console.log(result);
@@ -44,7 +54,7 @@ router.post('/:_id/save', auth, async (req, res, next) => {
     }
 });
 
-router.post('/comment', auth, async (req, res, next) => {
+router.post('/comment', async (req, res, next) => {
     try {
         let result = await postService.addComment(req.body);
         console.log(result);
