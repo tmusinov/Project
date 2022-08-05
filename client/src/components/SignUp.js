@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -13,15 +12,13 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
 import authService from '../services/authService';
-import ImageUpload from './ImageUpload';
-import config from '../config';
 
 function Copyright() {
     return (
         <Typography variant="body2" color="textSecondary" align="center">
             {'Copyright © '}
-            <Link color="inherit" href="/">
-                CarSocial
+            <Link color="inherit" href="https://material-ui.com/">
+                Your Website
       </Link>{' '}
             {new Date().getFullYear()}
             {'.'}
@@ -51,8 +48,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignUp() {
     const classes = useStyles();
-    const history = useHistory();
-    const [file, setFile] = useState();
 
     const [email, setEmail] = useState('');
     const [fullName, setFullName] = useState('');
@@ -61,20 +56,12 @@ export default function SignUp() {
 
     async function handleRegister(e) {
         e.preventDefault();
-        let cloudinaryData = new FormData();
-        cloudinaryData.append('upload_preset', config.CLAUDINARY_PRESET_NAME);
-        cloudinaryData.append('file', file);
-
-        let cloudinaryResponse = await fetch(`${config.CLAUDINARY_API_URL}/image/upload`, {
-            method: 'POST',
-            body: cloudinaryData,
-        });
-
-        let image = await cloudinaryResponse.json();
-        let imageUrl = image.secure_url;
-
-        let res = await authService.register({ email, fullName, imageUrl, username, password });
-        history.push('/');
+        console.log(email);
+        console.log(fullName);
+        console.log(username);
+        console.log(password);
+        let res = await authService.register({ email, fullName, username, password });
+        console.log(res);
     }
 
     return (
@@ -143,9 +130,6 @@ export default function SignUp() {
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                         </Grid>
-                        <Grid item xs={12}>
-                            <ImageUpload file={file} setFile={setFile} />
-                        </Grid>
                     </Grid>
                     <Button
                         type="submit"
@@ -158,7 +142,7 @@ export default function SignUp() {
                     </Button>
                     <Grid container justify="flex-end">
                         <Grid item>
-                            <Link href="/login" variant="body2">
+                            <Link href="#" variant="body2">
                                 Already have an account? Sign in
                             </Link>
                         </Grid>

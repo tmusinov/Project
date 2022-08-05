@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -22,7 +21,6 @@ import DeleteIcon from '@material-ui/icons/Delete';
 const useStyles = makeStyles((theme) => ({
     root: {
         minHeight: '300px',
-        maxHeight: '400px',
         overflowY: 'scroll',
     },
 }));
@@ -30,48 +28,18 @@ const useStyles = makeStyles((theme) => ({
 
 export default function InteractiveList(props) {
     const classes = useStyles();
-    const history = useHistory();
-    console.log(props);
+    console.log(props.comments);
 
     const handleClick = (id) => {
-        history.go(`/profile/${id}`)
         console.log(id);
     }
     return (
         <Grid item xs={12} className={classes.root}>
             <List >
-                <ListItem >
-                    <ListItemAvatar>
-                        <Avatar alt={props.ownerComment.username} src={props.ownerComment.owner.profileImage} />
-                    </ListItemAvatar>
-                    <ListItemText
-                        primary={
-                            <React.Fragment>
-                                <Link onClick={() => handleClick(props.ownerComment._id)}>{props.ownerComment.username} </Link>
-                                <Typography
-                                    component="span"
-                                    variant="body2"
-                                    className={classes.inline}
-                                    color="textPrimary"
-                                >
-                                    {props.ownerComment.description}
-                                </Typography>
-                            </React.Fragment>
-                        }
-                        secondary={
-                            '10h'
-                        }
-                    />
-                    <ListItemSecondaryAction>
-                        <IconButton edge="end" aria-label="delete">
-                            <FavoriteBorderRoundedIcon />
-                        </IconButton>
-                    </ListItemSecondaryAction>
-                </ListItem>
                 {props.comments.map(x =>
                     <ListItem key={x._id}>
                         <ListItemAvatar>
-                            <Avatar alt={x.user.username} src={x.user.profileImage} />
+                        <Avatar alt={x.user.username} src={x.user.profileImage} />
                         </ListItemAvatar>
                         <ListItemText
                             primary={
