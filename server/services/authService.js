@@ -4,7 +4,7 @@ const { SALT_ROUNDS, SECRET } = require('../config');
 const User = require('../models/User');
 
 const register = async (data) => {
-    const { email, fullName, username, password, isPublic } = data;
+    const { email, fullName, imageUrl, username, password, isPublic } = data;
 
     let userdb = await User.findOne({ username });
     if (userdb) throw { error: { message: 'User already exists!' } };
@@ -12,7 +12,7 @@ const register = async (data) => {
     let salt = await bcrypt.genSalt(SALT_ROUNDS);
     let hash = await bcrypt.hash(password, salt);
 
-    const user = new User({ email, fullName, username, isPublic: true, password: hash });
+    const user = new User({ email, fullName, username, profileImage: imageUrl, isPublic: true, password: hash });
 
     return await user.save();
 };
@@ -41,9 +41,17 @@ const login = async (data) => {
 };
 
 const getUserById = async (id) => {
-    let data = await User.findOne({ _id: id }).populate({ path: 'posts', select: 'imageUrl' }).select('username followers following posts bio profileImage').lean();
+    let data = await User.findOne({ _id: id }).populate({ path: 'posts', select: 'imageUrl' }).select('username fullName email followers following posts bio profileImage').lean();
     console.log(data);
     return data;
+};
+
+const getUserData = async (data) => {
+    const { _id, user } = data;
+    if (_id !== user._id) throw { error: { message: 'Cannot perform this action' } };
+
+    let resa = await User.findOne({ _id }).select('email fullName username bio').lean();
+    return resa;
 };
 
 const getUserSavedPosts = async (id) => {
@@ -71,17 +79,38 @@ const followUser = async (users) => {
     return await user.save();
 };
 
-const getUsername = async (_id) => {
-    let result = await User.findById(_id).select('username');
-    return result.username;
+const deleteUser = async (data) => {
+    const { _id, user } = data;
+    if (_id !== user._id) throw { error: { message: 'Cannot perform this action' } };
+
+    let dbuser = await User.findOne({ _id });
+
+    return await User.deleteOne(dbuser);
+};
+
+const editUser = async (incData) => {
+    const { _id, user, data } = incData;
+    if (_id !== user._id) throw { error: { message: 'Cannot perform this action' } };
+
+    let dbuser = await User.findOneAndUpdate({ _id }, { ...data.data });
+    return await dbuser.save();
+};
+
+const getUserByUsername = async (data) => {
+    const { query } = data
+    let result = await User.find({ "username": { "$regex": `${query}`, "$options": "i" } }).select('username profileImage');
+    return result;
 };
 
 module.exports = {
     register,
     login,
-    getUsername,
+    getUserData,
+    editUser,
+    getUserByUsername,
     getUserById,
     getUsers,
     followUser,
+    deleteUser,
     getUserSavedPosts,
 };
