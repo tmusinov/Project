@@ -8,7 +8,7 @@ function auth(req, res, next) {
              errorMessage: "Unauthorized" });
 
              const decoded = jwt.verify(token, config.SECRET);
-             req.user = decoded.user;
+             req.user = decoded;
 
              next();
             } catch (error) {

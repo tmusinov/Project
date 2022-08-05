@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from 'react';
+import { useHistory, Link } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
-import Box from '@material-ui/core/Box';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -15,19 +13,7 @@ import Container from '@material-ui/core/Container';
 import authService from '../services/authService';
 import ImageUpload from './ImageUpload';
 import config from '../config';
-
-function Copyright() {
-    return (
-        <Typography variant="body2" color="textSecondary" align="center">
-            {'Copyright © '}
-            <Link color="inherit" href="/">
-                CarSocial
-      </Link>{' '}
-            {new Date().getFullYear()}
-            {'.'}
-        </Typography>
-    );
-}
+import UserContext from '../UserContext';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -49,33 +35,58 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function SignUp() {
+export default function SignUp(props) {
     const classes = useStyles();
+    document.title = 'Edit profile ● Instacars';
     const history = useHistory();
-    const [file, setFile] = useState();
+    const context = useContext(UserContext);
+
+    const [file, setFile] = useState(null);
+    const [profileImage, setProfileImage] = useState(null);
 
     const [email, setEmail] = useState('');
     const [fullName, setFullName] = useState('');
     const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [bio, setBio] = useState('');
 
-    async function handleRegister(e) {
+    async function handleEdit(e) {
         e.preventDefault();
-        let cloudinaryData = new FormData();
-        cloudinaryData.append('upload_preset', config.CLAUDINARY_PRESET_NAME);
-        cloudinaryData.append('file', file);
+        let userId = context.user._id;
+        if (file) {
+            let cloudinaryData = new FormData();
+            cloudinaryData.append('upload_preset', config.CLAUDINARY_PRESET_NAME);
+            cloudinaryData.append('file', file);
 
-        let cloudinaryResponse = await fetch(`${config.CLAUDINARY_API_URL}/image/upload`, {
-            method: 'POST',
-            body: cloudinaryData,
-        });
+            let cloudinaryResponse = await fetch(`${config.CLAUDINARY_API_URL}/image/upload`, {
+                method: 'POST',
+                body: cloudinaryData,
+            });
 
-        let image = await cloudinaryResponse.json();
-        let imageUrl = image.secure_url;
+            let image = await cloudinaryResponse.json();
+            setProfileImage(image.secure_url);
+        }
 
-        let res = await authService.register({ email, fullName, imageUrl, username, password });
+        let res = await authService.edit({ email, fullName, profileImage, bio, username, userId });
+        console.log('hello');
         history.push('/');
     }
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await authService.getUser(props.match.params.id);
+            if (data.result) {
+                console.log('eidt pga', data);
+                const { email, fullName, username, bio, profileImage } = data.result;
+                setEmail(email);
+                setFullName(fullName);
+                setUsername(username);
+                setBio(bio);
+                setProfileImage(profileImage);
+            }
+        };
+
+        fetchData();
+    }, [])
 
     return (
         <Container component="main" maxWidth="xs">
@@ -85,9 +96,9 @@ export default function SignUp() {
                     <LockOutlinedIcon />
                 </Avatar>
                 <Typography component="h1" variant="h5">
-                    Sign up
+                    Edit profile
                 </Typography>
-                <form className={classes.form} noValidate onSubmit={(e) => handleRegister(e)}>
+                <form className={classes.form} noValidate onSubmit={(e) => handleEdit(e)}>
                     <Grid container spacing={2}>
                         <Grid item xs={12}>
                             <TextField
@@ -96,9 +107,7 @@ export default function SignUp() {
                                 fullWidth
                                 id="email"
                                 label="Email Address"
-                                name="email"
                                 autoComplete="email"
-                                autoFocus
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
@@ -106,7 +115,6 @@ export default function SignUp() {
                         <Grid item xs={12}>
                             <TextField
                                 autoComplete="fname"
-                                name="fullName"
                                 variant="outlined"
                                 required
                                 fullWidth
@@ -119,7 +127,6 @@ export default function SignUp() {
                         <Grid item xs={12}>
                             <TextField
                                 autoComplete="uname"
-                                name="username"
                                 variant="outlined"
                                 required
                                 fullWidth
@@ -134,13 +141,11 @@ export default function SignUp() {
                                 variant="outlined"
                                 required
                                 fullWidth
-                                name="password"
-                                label="Password"
-                                type="password"
-                                id="password"
-                                autoComplete="current-password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
+                                label="Bio"
+                                type="text"
+                                id="bio"
+                                value={bio}
+                                onChange={(e) => setBio(e.target.value)}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -154,20 +159,17 @@ export default function SignUp() {
                         color="primary"
                         className={classes.submit}
                     >
-                        Sign Up
+                        Save changes
                     </Button>
                     <Grid container justify="flex-end">
                         <Grid item>
-                            <Link href="/login" variant="body2">
-                                Already have an account? Sign in
+                            <Link to={`/profile/${context.user._id}`} variant="body2">
+                                Go back
                             </Link>
                         </Grid>
                     </Grid>
                 </form>
             </div>
-            <Box mt={5}>
-                <Copyright />
-            </Box>
         </Container>
     );
 }
