@@ -22,7 +22,7 @@ const getAll = async (data) => {
     let posts = await Post.find().populate({ path:
          'owner', select: 'username' }).populate({ path:
              'comments', populate: { path: 'user' } }).lean();
-    console.log(posts);
+    //console.log(posts);
 
 
     return posts;

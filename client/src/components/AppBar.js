@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -15,12 +15,12 @@ import SearchIcon from '@material-ui/icons/Search';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MailIcon from '@material-ui/icons/Mail';
 import SendIcon from '@material-ui/icons/Send';
-
 import MoreIcon from '@material-ui/icons/MoreVert';
+import UserContext from '../UserContext';
 
 import { Link } from 'react-router-dom'
 
-import Create from "./Create"
+import Create from "./Create";
 
 const useStyles = makeStyles((theme) => ({
     grow: {
@@ -84,6 +84,16 @@ const useStyles = makeStyles((theme) => ({
             display: 'none',
         },
     },
+    link: {
+        color: 'white'
+    },
+    navLink: {
+        color: 'black',
+        textDecoration: 'none'
+    },
+    appBar: {
+        marginBottom: "110px",
+    }
 }));
 
 export default function PrimarySearchAppBar() {
@@ -92,9 +102,16 @@ export default function PrimarySearchAppBar() {
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
 
     const [open, setOpen] = useState(false);
+    const context = useContext(UserContext)
 
     const isMenuOpen = Boolean(anchorEl);
     const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
+
+    const handleLogOut = () => {
+        console.log(context);
+        handleMenuClose();
+        context.logOut();
+    }
 
     const handleProfileMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -115,11 +132,11 @@ export default function PrimarySearchAppBar() {
 
     const handleOpen = () => {
         setOpen(true);
-    }
+    };
 
     const handleClose = () => {
         setOpen(false);
-    }
+    };
 
     const menuId = 'primary-search-account-menu';
     const renderMenu = (
@@ -132,8 +149,12 @@ export default function PrimarySearchAppBar() {
             open={isMenuOpen}
             onClose={handleMenuClose}
         >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-            <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+            <Link to={`/profile/${context.user._id}`} className={classes.navLink}>
+                <MenuItem onClick={handleMenuClose}>
+                    Profile
+            </MenuItem>
+            </Link>
+            <MenuItem onClick={handleLogOut}>Log out</MenuItem>
         </Menu>
     );
 
@@ -179,15 +200,14 @@ export default function PrimarySearchAppBar() {
                 >
                     <AccountCircle />
                 </IconButton>
-                <p>Profile</p>
+                <Link to={`/profile/${context.user._id}`}>Profile</Link>
             </MenuItem>
         </Menu>
     );
 
     return (
-        <div className={classes.grow}>
-            <Create handleOpen={handleOpen}
-            handleClose={handleClose} open={open} />
+        <div className={[classes.grow, classes.appBar]}>
+            <Create handleOpen={handleOpen} handleClose={handleClose} open={open} />
             <AppBar position="fixed">
                 <Toolbar>
                     <IconButton
@@ -198,7 +218,7 @@ export default function PrimarySearchAppBar() {
                     >
                     </IconButton>
                     <Typography className={classes.title} variant="h6" noWrap>
-                        Car?
+                        CarSocial
                     </Typography>
                     <div className={classes.search}>
                         <div className={classes.searchIcon}>
@@ -215,17 +235,21 @@ export default function PrimarySearchAppBar() {
                     </div>
                     <div className={classes.grow} />
                     <div className={classes.sectionDesktop}>
-                    <IconButton aria-label="add" color="inherit" onClick={handleOpen}>
+                        <IconButton aria-label="add" color="inherit" onClick={handleOpen}>
                             <AddIcon />
                         </IconButton>
                         <IconButton aria-label="show 4 new mails" color="inherit">
                             <Badge badgeContent={4} color="secondary">
-                                <HomeIcon />
+                                <Link to="/" className={classes.link}>
+                                    <HomeIcon />
+                                </Link>
                             </Badge>
                         </IconButton>
                         <IconButton aria-label="show 17 new notifications" color="inherit">
                             <Badge badgeContent={17} color="secondary">
-                                <SendIcon />
+                                <Link to="/inbox" className={classes.link}>
+                                    <SendIcon />
+                                </Link>
                             </Badge>
                         </IconButton>
                         <IconButton
