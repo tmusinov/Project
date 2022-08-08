@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Route, Link, NavLink, Redirect, Switch, useHistory } from 'react-router-dom';
+import { BrowserRouter, Route, Redirect, Switch, useHistory } from 'react-router-dom';
 
-import { Container, Grid } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import { makeStyles } from '@material-ui/core/styles';
 
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import Feed from "./components/Feed";
-import AppBar from "./components/AppBar";
 import UserPage from "./components/UserPage";
 import PostDetails from "./components/PostDetails"
 
@@ -45,10 +44,10 @@ function App() {
   }
 
   const logOut = async () => {
-    setUser(null);
     localStorage.clear();
     await authService.logOut();
-    history.push('/login');
+    setUser(null);
+    history.goBack();
     //setLoggedIn(false);
   }
 
@@ -57,9 +56,13 @@ function App() {
     <UserContext.Provider value={{ user, logIn, logOut, }}>
       <BrowserRouter>
         <Switch>
-          <Route path="/profile/:id" exact component={UserPage} />
-          <Route path="/profile/:id/saved" component={UserPage} />
-          <Route path="/profile/:id/edit" exact component={EditPage} />
+          <Route path="/profile/:id" 
+          exact component={UserPage} />
+          <Route path="/profile/:id/saved" 
+          component={UserPage} />
+          <Route path="/profile/:id/edit" 
+          exact component={EditPage} />
+          <Route path="/p/:id" component={PostDetails} />
 
           <Route path="/" exact>
             {isLoggedIn ? (

@@ -63,7 +63,9 @@ export default function UserPage({ ...props }) {
     const classes = useStyles();
     const context = useContext(UserContext)
     const history = useHistory();
-    console.log(props);
+    // console.log('props', props);
+    const [userId, setUserId] = useState(props.match.params.id)
+    console.log('params', userId);
 
     const [user, setUser] = useState(null);
     const [page, setPage] = useState(0);
@@ -92,6 +94,7 @@ export default function UserPage({ ...props }) {
             userId: context.user._id,
             followedUserId: id,
         }
+
         setIsFollowed(!isFollowed);
         let res = await authService.followUser(users);
         console.log(res);
@@ -112,7 +115,7 @@ export default function UserPage({ ...props }) {
         };
 
         fetchData();
-    }, []);
+    }, [props.match.params.id]);
 
     const [anchorEl, setAnchorEl] = React.useState(null);
     const open = Boolean(anchorEl);
@@ -127,15 +130,14 @@ export default function UserPage({ ...props }) {
 
     const handleDelete = async () => {
         let userId = context.user._id;
-        //let res = await authService.deleteUser(userId);
+        let res = await authService.deleteUser(userId);
         context.logOut();
     }
 
     const handleEdit = async () => {
         let userId = context.user._id;
         history.push(`/profile/${userId}/edit`);
-        //let res = await authService.deleteUser(userId);
-        //context.logOut();
+        let res = await authService.edit(userId);
     }
 
     return (
@@ -200,7 +202,7 @@ export default function UserPage({ ...props }) {
                                     </Grid>
                                 </Grid>
                                 <Grid container item>
-                                    <Typography>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</Typography>
+                                    <Typography>{user.bio}</Typography>
                                 </Grid>
                             </Grid>
                         </Grid>

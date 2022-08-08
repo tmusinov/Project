@@ -14,6 +14,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import authService from '../services/authService';
 import UserContext from '../UserContext';
+import Toaster from './Toaster';
 
 function Copyright() {
     return (
@@ -61,29 +62,38 @@ const useStyles = makeStyles((theme) => ({
 
 export default function SignInSide(props) {
     const classes = useStyles();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const history = useHistory();
     const context = useContext(UserContext)
-
-    console.log('login', context);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [open, setOpen] = useState(false);
+    const [message, setMessage] = useState('');
 
     async function handleLogin(e) {
         e.preventDefault();
-        let response = await authService.login({ email, password });
-        console.log('res ', response.user);
-        if (response) {
-            let user = response.user;
-            context.logIn({ ...user });
-            history.push('/')
-        } else {
-            // show error
+        try {
+            let response = await authService.login({ email, password });
+            if (response.user) {
+                let user = response.user;
+                context.logIn({ ...user });
+                history.push('/')
+            } else {
+                let errorObj = { ...response.error }
+                setMessage(errorObj.error.message)
+                setOpen(true);
+            }
+        } catch (error) {
+            console.log(error);
         }
 
     }
 
     return (
-        <Grid container component="main" className={classes.root}>
+        <Grid container component="main" 
+        className={classes.root}>
+            {open ? (
+                <Toaster open={open} type={'error'} message={message} setOpen={setOpen} />
+            ) : ('')}
             <CssBaseline />
             <Grid item xs={false} sm={4} md={7} className={classes.image} />
             <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
@@ -137,7 +147,7 @@ export default function SignInSide(props) {
             </Button>
                         <Grid container>
                             <Grid item xs>
-                                <Link href="#" variant="body2">
+                            <Link to="/" variant="body2">
                                     Forgot password?
                 </Link>
                             </Grid>
