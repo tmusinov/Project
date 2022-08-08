@@ -92,6 +92,7 @@ export default function UserPage({ ...props }) {
             userId: context.user._id,
             followedUserId: id,
         }
+        setIsFollowed(!isFollowed);
         let res = await authService.followUser(users);
         console.log(res);
     }

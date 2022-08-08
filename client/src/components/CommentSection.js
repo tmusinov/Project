@@ -1,5 +1,6 @@
 import React from 'react';
-import { Link } from '@material-ui/core';
+import { Link } from 'react-router-dom';
+import { Link as MLink } from '@material-ui/core';
 import { useHistory } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
@@ -18,6 +19,9 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import FolderIcon from '@material-ui/icons/Folder';
 import DeleteIcon from '@material-ui/icons/Delete';
+import moment from 'moment';
+
+import Comment from './CommentSectionComment'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -31,12 +35,9 @@ const useStyles = makeStyles((theme) => ({
 export default function InteractiveList(props) {
     const classes = useStyles();
     const history = useHistory();
-    console.log(props);
+    const createdAt = moment(props.ownerComment.createdAt).fromNow();
+    console.log('id', props);
 
-    const handleClick = (id) => {
-        history.go(`/profile/${id}`)
-        console.log(id);
-    }
     return (
         <Grid item xs={12} className={classes.root}>
             <List >
@@ -47,7 +48,7 @@ export default function InteractiveList(props) {
                     <ListItemText
                         primary={
                             <React.Fragment>
-                                <Link onClick={() => handleClick(props.ownerComment._id)}>{props.ownerComment.username} </Link>
+                                <MLink >{props.ownerComment.username} </MLink>
                                 <Typography
                                     component="span"
                                     variant="body2"
@@ -59,44 +60,12 @@ export default function InteractiveList(props) {
                             </React.Fragment>
                         }
                         secondary={
-                            '10h'
+                            createdAt
                         }
                     />
-                    <ListItemSecondaryAction>
-                        <IconButton edge="end" aria-label="delete">
-                            <FavoriteBorderRoundedIcon />
-                        </IconButton>
-                    </ListItemSecondaryAction>
                 </ListItem>
                 {props.comments.map(x =>
-                    <ListItem key={x._id}>
-                        <ListItemAvatar>
-                            <Avatar alt={x.user.username} src={x.user.profileImage} />
-                        </ListItemAvatar>
-                        <ListItemText
-                            primary={
-                                <React.Fragment>
-                                    <Link onClick={() => handleClick(x.user._id)}>{x.user.username} </Link>
-                                    <Typography
-                                        component="span"
-                                        variant="body2"
-                                        className={classes.inline}
-                                        color="textPrimary"
-                                    >
-                                        {x.content}
-                                    </Typography>
-                                </React.Fragment>
-                            }
-                            secondary={
-                                '10h 12likes'
-                            }
-                        />
-                        <ListItemSecondaryAction>
-                            <IconButton edge="end" aria-label="delete">
-                                <FavoriteBorderRoundedIcon />
-                            </IconButton>
-                        </ListItemSecondaryAction>
-                    </ListItem>
+                    <Comment key={x._id} comment={x} />
                 )}
             </List>
         </Grid>
