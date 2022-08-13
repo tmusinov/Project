@@ -11,7 +11,7 @@ Guests can
 
 ## Private Part 
 **Accessible only for logged in users**
-Clients can
+Users can
 * view all pages
 * can create posts
 * view his own posts
